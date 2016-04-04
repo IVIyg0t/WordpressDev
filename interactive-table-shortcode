@@ -1,0 +1,60 @@
+ /*  
+ **
+ ** Shortcode declaration and functionality for the user_database_system 
+ ** Pulls data from multi-page-form-shortcode database entries
+ ** [mm_user_database]
+ */
+    add_shortcode('mm_user_database','mm_user_database_generate');
+    function mm_user_database_generate(){
+        global $wpdb;
+        $user_ID = get_current_user_id();
+        $form_db_name = "form_contact_information";
+        $results = $wpdb->get_results("Select * FROM $form_db_name");
+        $first = TRUE;
+        echo '<div id="user_data_table_div">
+              <label for="user_data_search"><strong>Search for anything in a row</strong></label>
+              <input type="text" id="user_data_search" /> 
+              <label id="eg-search"> eg. A user ID, first name, last name etc...</label>';
+              
+              //<button id="btnSearch">Search</button>';
+        
+        foreach ($results as $user_data){
+            if($first){
+              echo '<table id="user_data_table" style="width:100%">
+                    <thead>
+                    <tr class="table-header">
+                        <th title="User ID">User ID</th>
+                        <th title="First Name">First Name</th>
+                        <th title="Last Name">Last Name</th>
+                        <th title="Contact Form">Contact Form</th>
+                    </tr>
+                    </thead>';
+               $first = FALSE;
+            }
+            echo '<tbody>
+                  <tr class="parent" id="'.$user_data->user_ID.'" title="Click to expand/collapse" >
+                    <td class="user_ID">'.$user_data->user_ID.'</td>
+                    <td class="first_name">'.$user_data->first_name.'</td>
+                    <td class="last_name">'.$user_data->last_name.'</td>
+                    <td class="contact_form">YES</td>             
+                  </tr>
+                  <tr class="child-'.$user_data->user_ID.' child-row" style="display: none">
+                    <td colspan="4">
+                        <h3>Contact Information</h3>
+<pre>
+<b>Email:</b> '.$user_data->email.'  <b>Phone: </b>'.$user_data->phone.'
+<b>Address 1:</b> '.$user_data->address1.'
+<b>Address 2:</b> '.$user_data->address2.'
+<b>Country:</b> '.$user_data->country.'
+<b>State/Province:</b> '.$user_data->state.'
+<b>City:</b> '.$user_data->city.'
+<b>Zip Code:</b> '.$user_data->zip_code.'
+</pre>
+                    </td>
+                    <td class="empty-cell" style="display: none"></td>
+                    <td class="empty-cell" style="display: none"></td>
+                    <td class="empty-cell" style="display: none"></td>';    
+        }
+        echo '</tbody></table></div>';
+        //echo do_shortcode('[wp_jdt id="user_data_table"]');        
+    }
